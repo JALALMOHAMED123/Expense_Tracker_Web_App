@@ -1,0 +1,30 @@
+{
+  "name": "expense_tracker_web_app",
+  "version": "1.0.0",
+  "description": "Expense Tracker App",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JALALMOHAMED123/Expense_Tracker_App.git"
+  },
+  "keywords": [
+    "Expense",
+    "Tracker"
+  ],
+  "author": "Jalal Mohamed",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/JALALMOHAMED123/Expense_Tracker_App/issues"
+  },
+  "homepage": "https://github.com/JALALMOHAMED123/Expense_Tracker_App#readme",
+  "dependencies": {
+    "body-parser": "^1.20.2",
+    "express": "^4.19.2",
+    "mysql2": "^3.11.0",
+    "sequelize": "^6.37.3"
+  }
+}
