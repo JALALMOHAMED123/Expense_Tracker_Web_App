@@ -1,14 +1,14 @@
 $(document).ready(function (){
-    $('#createuser').on('submit', function(event){
+    $('#loginuser').on('submit', function(event){
         event.preventDefault();
         const formdata=$(this).serialize();
         $('#error-message').text('');
-        $.post('/signup', formdata, function (data) {
+        $.post('/login', formdata, function (data) {
             alert(data.message);
-            $('#createuser')[0].reset(); 
+            $('#loginuser')[0].reset(); 
           })
-        .fail(function(msg){
-            const resErr = msg.responseJSON;
+        .fail(function(xhr){
+            const resErr = xhr.responseJSON;
             if (resErr && resErr.error) {
             $('#error-message').text(resErr.error);
             } else {
