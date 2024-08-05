@@ -1,6 +1,5 @@
 const path=require('path');
 const User=require('../models/signup');
-const { where } = require('sequelize');
 
 exports.getSignup=(req,res)=>{
     res.sendFile(path.join(__dirname, '../views/signup.html'));
@@ -33,12 +32,12 @@ exports.postLogin=async(req,res)=>{
         const user=await User.findOne({ where: {email}});
         if(user){
             const user_pwd=await User.findOne({ where: {email, password}});
-            if(user_pwd){ return res.status(200).json({message: "Login successfully"}); }
+            if(user_pwd){ return res.status(200).json({message: "User login successfull"}); }
             else{
-            res.status(403).json({error: "Password not matched"});
+            res.status(401).json({error: "User not authorized"});
             }
         }
-        else{ res.status(404).json({error: "Email not found"}); }
+        else{ res.status(404).json({error: "User not found"}); }
     }
     catch(err){
         res.status(404).json({error: "Login not working"});
