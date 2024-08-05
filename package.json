@@ -22,6 +22,7 @@
   },
   "homepage": "https://github.com/JALALMOHAMED123/Expense_Tracker_App#readme",
   "dependencies": {
+    "bcrypt": "^5.1.1",
     "body-parser": "^1.20.2",
     "express": "^4.19.2",
     "mysql2": "^3.11.0",

@@ -1,19 +1,26 @@
-$(document).ready(function (){
-    $('#createuser').on('submit', function(event){
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('createuser').addEventListener('submit', function(event) {
         event.preventDefault();
-        const formdata=$(this).serialize();
-        $('#error-message').text('');
-        $.post('/signup', formdata, function (data) {
-            alert(data.message);
-            $('#createuser')[0].reset(); 
-          })
-        .fail(function(msg){
-            const resErr = msg.responseJSON;
-            if (resErr && resErr.error) {
-            $('#error-message').text(resErr.error);
-            } else {
-            alert('Error submitting form');
-            }
-        })
-    })
+
+        const data={
+            name: event.target.name.value,
+            email: event.target.email.value,
+            password: event.target.password.value,
+        }
+        const errorMessage = document.getElementById('error-message');
+        errorMessage.textContent = '';
+
+        axios.post('/signup', data)
+            .then(function(response) {
+                alert(response.data.message);
+                document.getElementById('createuser').reset();
+            })
+            .catch(function(error) {
+                if (error.response && error.response.data.error) {
+                    errorMessage.textContent = error.response.data.error;
+                } else {
+                    alert('Error submitting form');
+                }
+            });
+    });
 });
