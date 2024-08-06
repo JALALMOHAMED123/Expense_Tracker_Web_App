@@ -4,8 +4,10 @@ $(document).ready(function (){
         const formdata=$(this).serialize();
         $('#error-message').text('');
         $.post('/login', formdata, function (data) {
-            alert(data.message);
-            $('#loginuser')[0].reset(); 
+            $('#loginuser')[0].reset();
+            if(data.redirect){
+                window.location.href=data.redirect;
+            }
           })
         .fail(function(xhr){
             const resErr = xhr.responseJSON;

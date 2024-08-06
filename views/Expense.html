@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expense</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="/js/Expense.js" defer></script>
+</head>
+<body>
+    <form id="createExpense">
+        <label for="expense">Choose Expensement:</label>
+        <input type="number" id="expense" name="amount" required><br>
+        <label for="desc">Description:</label>
+        <textarea type="text" id="desc" name="description" required></textarea><br>
+        <label for="desc">Choose catagory:</label>
+        
+        <select name="category" required>
+            <option name="fuel">Petrol</option>
+            <option name="movie">Movie</option>
+            <option name="food">Food</option>
+        </select>
+        <br>
+        <button type="submit">Add Expense</button>
+    </form>
+    <ul id="list"></ul>
+</body>
+</html>

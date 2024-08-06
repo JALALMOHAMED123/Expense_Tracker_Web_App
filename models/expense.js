@@ -1,26 +1,25 @@
 const Datatype=require('sequelize');
 const sequelize=require('../util/db');
 
-const User=sequelize.define('User', {
+const Expense=sequelize.define('Expense', {
     id: {
         type: Datatype.INTEGER,
         autoIncrement: true,
         primaryKey: true,
         allowNull: false
     },
-    name: {
+    amount: {
+        type: Datatype.INTEGER,
+        allowNull: false
+    },
+    description: {
         type: Datatype.STRING,
         allowNull: false
     },
-    email: {
-        type: Datatype.STRING,
-        allowNull: false,
-        unique: true
-    },
-    password: {
+    category: {
         type: Datatype.STRING,
         allowNull: false
     }
 })
 
-module.exports=User;
+module.exports=Expense;
