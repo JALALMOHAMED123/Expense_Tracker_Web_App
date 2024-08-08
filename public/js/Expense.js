@@ -6,46 +6,52 @@ document.addEventListener("DOMContentLoaded", function(){
             description: event.target.description.value,
             category: event.target.category.value
         };
-
+        
         axios.post('/createExpense',data)
         .then((response)=>{
             alert(response.data.message);
             document.getElementById('createExpense').reset();
-            fetchExpenses(); 
+            const { id, amount, category, description } = response.data.expense;
+            showDetails(id, amount, category, description);
         })
         .catch((err)=>{
             alert(err);
         });
-
-        axios.get(`/delete/${id}`, data)
-        .then((response)=>{
-            alert(response.data.message);
-            fetchExpenses();
-        })
-        .catch((err)=>{
-            alert(err);
-        })
     });
 });
-
-function showDetails(id, amount, category, des){
-    const ul=document.getElementById('list');
-    const li=document.createElement('li');
-    li.innerHTML=`${amount} - ${category} - ${des}
-                 <a href="delete/${id}">Delete</a>`
-    ul.appendChild(li);
-}
-async function fetchExpenses(){
+window.addEventListener("DOMContentLoaded", async ()=>
+{
     try{
-        const res=await axios.get('/api/expenses');
+        const token=localStorage.getItem('token');
+        const res=await axios.get('/api/expenses', { headers: { "Authorization" :token }});
         const expenses= res.data;
         const ul = document.getElementById('list');
         ul.innerHTML = ''; 
         expenses.forEach(expense => {
-            showDetails(expense.id, expense.amount, expense.description, expense.category);
+            showDetails(expense.id, expense.amount, expense.category, expense.description );
         });
     } catch (error) {
         console.error('Error:', error);
     }
+});
+
+
+function deletefun(event, id){
+    axios.delete(`/delete/${id}`)
+        .then((response)=>{
+            alert(response.data.message);
+            const expenseId=`${id}`;
+            document.getElementById(expenseId).remove();
+        })
+        .catch((err)=>{
+            alert(err);
+        })
 }
-window.onload=fetchExpenses();
+function showDetails(id, amount, category, des){
+    const ul=document.getElementById('list');
+    const li=document.createElement('li');
+    li.setAttribute("id",id);
+    li.innerHTML=`${amount} - ${category} - ${des}
+                 <button onclick="deletefun(event, ${id})">Delete</button>`
+    ul.appendChild(li);
+}

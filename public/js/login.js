@@ -6,6 +6,7 @@ $(document).ready(function (){
         $.post('/login', formdata, function (data) {
             $('#loginuser')[0].reset();
             if(data.redirect){
+                localStorage.setItem("token", data.token);
                 window.location.href=data.redirect;
             }
           })

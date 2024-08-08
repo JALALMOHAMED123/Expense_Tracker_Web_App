@@ -2,6 +2,8 @@ const path=require('path');
 const User=require('../models/signup');
 const Expense=require('../models/expense');
 const bcrypt=require('bcrypt');
+const jwt=require('jsonwebtoken');
+const { where } = require('sequelize');
 
 exports.getSignup=(req,res)=>{
     res.sendFile(path.resolve('views/signup.html'));
@@ -33,6 +35,9 @@ exports.getLogin=(req,res)=>{
     res.sendFile(path.join(__dirname,'../views/login.html'));
 }
 
+function webtoken(id){
+    return jwt.sign({ userId: id}, '374bfu2yryr8234rt02bfe032r230');
+}
 exports.postLogin=async(req,res)=>{
     try{
         const {email, password}=req.body;
@@ -43,8 +48,7 @@ exports.postLogin=async(req,res)=>{
                     throw new Error("something went wrong");
                 }
                 if(result==true) {
-                    req.session.user = user;
-                    return res.json({ redirect: '/Expense' });
+                    return res.json({ redirect: '/Expense', token: webtoken(user[0].id)});
                 }
                 else{
                     res.status(401).json({error: "User not authorized"});
@@ -57,13 +61,6 @@ exports.postLogin=async(req,res)=>{
         res.status(404).json({error: err});
     }
 }
-exports.isAuth = (req, res, next) => {
-    if (req.session && req.session.user) {
-      return next(); 
-    } else {
-      res.redirect('/login');
-    }
-  };
   
 exports.getExpense=(req, res)=>{
     res.sendFile(path.resolve('views/Expense.html'));
@@ -71,8 +68,8 @@ exports.getExpense=(req, res)=>{
 
 exports.fetchExpense=async(req, res)=>{
     try {
-        const expenses = await Expense.findAll(); // Fetch all expenses from the database
-        res.json(expenses); // Send expenses as JSON response
+        const expenses = await Expense.findAll( { where: {userId: req.user.id}} );
+        res.json(expenses); 
     } catch (error) {
         res.status(500).json({ error: 'Failed to fetch expenses' });
     }
@@ -80,8 +77,8 @@ exports.fetchExpense=async(req, res)=>{
 exports.postExpense=async (req, res)=>{
     try{
         const {amount, description, category}=req.body;
-        await Expense.create({amount, description, category})
-        res.status(201).json({message: "Expense created"});
+        const expense= await Expense.create({amount, description, category})
+        res.status(201).json({message: "Expense created", expense});
     }
     catch(error){
         res.status(404).json({error});
@@ -90,11 +87,9 @@ exports.postExpense=async (req, res)=>{
 
 exports.deleteExpense=(req,res)=>{
     const id=req.params.id;
-    Expense.findByPk(id)
-    .then((expense)=> {
-        expense.destroy();
-        // res.status(200).json({ message: "Expense destroyed"});
-        res.redirect('/Expense');
+    Expense.destroy({where: {id}})
+    .then(()=> {
+        return res.status(200).json({ message: "Expense destroyed"})
     })
     .catch(err=>res.status(500).json({error: err}));
 }

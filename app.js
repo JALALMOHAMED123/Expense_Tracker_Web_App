@@ -3,8 +3,9 @@ const bodyparser=require('body-parser');
 const path = require('path');
 const ExpenseRoutes=require('./routes/Expense_routes');
 const sequelize=require('./util/db');
-const session = require('express-session');
 
+const User=require('./models/signup');
+const Expense=require('./models/expense');
 const app=express();
 
 app.use(bodyparser.urlencoded({ extended: false}));
@@ -13,15 +14,11 @@ app.use(bodyparser.json());
 
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use(session({
-    secret: '123-324-354', 
-    resave: false,
-    saveUninitialized: false,
-    cookie: { secure: false } 
-  }));
-
 app.use(ExpenseRoutes);
- 
+
+User.hasMany(Expense);
+Expense.belongsTo(User);
+
 sequelize
     .sync()
     .then(result => {
