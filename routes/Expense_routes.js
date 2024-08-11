@@ -1,6 +1,7 @@
 const express=require('express');
 const router=express.Router();
 const expenseController=require('../controllers/expenseController');
+const purchaseController=require('../controllers/purchaseController');
 const userauth=require('../middleware/auth');
 
 router.get('/', (req,res)=> res.redirect('/signup') );
@@ -12,8 +13,11 @@ router.post('/login', expenseController.postLogin);
 
 router.get('/api/expenses', userauth.authenticate, expenseController.fetchExpense);
 router.get('/Expense', expenseController.getExpense);
-router.post('/createExpense', expenseController.postExpense);
+router.post('/createExpense', userauth.authenticate, expenseController.postExpense);
 
-router.delete('/delete/:id', expenseController.deleteExpense);
+router.delete('/delete/:id', userauth.authenticate,expenseController.deleteExpense);
+
+router.get('/PremiumMemberShip', userauth.authenticate,purchaseController.purchasePremium);
+router.post('/UpdatePremiumMemberShip', userauth.authenticate,purchaseController.updateStatus);
 
 module.exports=router;

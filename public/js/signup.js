@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const data={
             name: event.target.name.value,
             email: event.target.email.value,
-            password: event.target.password.value,
+            password: event.target.password.value
         }
         const errorMessage = document.getElementById('error-message');
         errorMessage.textContent = '';

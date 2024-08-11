@@ -28,6 +28,7 @@
     "express-session": "^1.18.0",
     "jsonwebtoken": "^9.0.2",
     "mysql2": "^3.11.0",
+    "razorpay": "^2.9.4",
     "sequelize": "^6.37.3"
   }
 }

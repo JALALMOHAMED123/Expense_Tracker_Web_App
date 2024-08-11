@@ -3,7 +3,6 @@ const User=require('../models/signup');
 const Expense=require('../models/expense');
 const bcrypt=require('bcrypt');
 const jwt=require('jsonwebtoken');
-const { where } = require('sequelize');
 
 exports.getSignup=(req,res)=>{
     res.sendFile(path.resolve('views/signup.html'));
@@ -11,7 +10,7 @@ exports.getSignup=(req,res)=>{
 
 exports.postSignup=async(req,res)=>{
     try{
-    const {name, email, password}=req.body;
+    const {name, email, password, ispremiumuser}=req.body;
     console.log(name);
     //check the user exist or not
     const userexist=await User.findOne({ where: {email} });
@@ -22,7 +21,7 @@ exports.postSignup=async(req,res)=>{
         const saltrounds=10;
         bcrypt.hash(password, saltrounds, async(err, hash)=>{
             console.log(err);
-            await User.create({name, email, password: hash});
+            await User.create({name, email, password: hash, ispremiumuser});
             res.status(201).json({ message: "User created successfully" });
         }) 
     }
@@ -68,6 +67,7 @@ exports.getExpense=(req, res)=>{
 
 exports.fetchExpense=async(req, res)=>{
     try {
+        console.log(req.user.id);
         const expenses = await Expense.findAll( { where: {userId: req.user.id}} );
         res.json(expenses); 
     } catch (error) {
@@ -77,17 +77,18 @@ exports.fetchExpense=async(req, res)=>{
 exports.postExpense=async (req, res)=>{
     try{
         const {amount, description, category}=req.body;
-        const expense= await Expense.create({amount, description, category})
+        // const expense= await Expense.create({amount, description, category, UserId: req.user.id})
+        const expense= await req.user.createExpense({amount, description, category});
         res.status(201).json({message: "Expense created", expense});
     }
     catch(error){
-        res.status(404).json({error});
+        res.status(404).json({error: "Expense not created"});
     }
 }
 
 exports.deleteExpense=(req,res)=>{
     const id=req.params.id;
-    Expense.destroy({where: {id}})
+    Expense.destroy({where: {id, UserId: req.user.id}})
     .then(()=> {
         return res.status(200).json({ message: "Expense destroyed"})
     })

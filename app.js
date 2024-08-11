@@ -6,6 +6,7 @@ const sequelize=require('./util/db');
 
 const User=require('./models/signup');
 const Expense=require('./models/expense');
+const Order = require('./models/orders');
 const app=express();
 
 app.use(bodyparser.urlencoded({ extended: false}));
@@ -18,6 +19,9 @@ app.use(ExpenseRoutes);
 
 User.hasMany(Expense);
 Expense.belongsTo(User);
+
+User.hasMany(Order);
+Order.belongsTo(User);
 
 sequelize
     .sync()
