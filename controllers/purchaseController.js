@@ -8,15 +8,17 @@ exports.purchasePremium=async(req,res)=>{
             key_secret: process.env.RAZORPAY_KEY_SECRET
         })
         const amount=2500;
-        rzp.orders.create({amount, current: "INR"}, (err, order)=>{
-            if(err){
-                throw new Error(JSON.stringify(err));
+        rzp.orders.create({amount, currency: "INR"}, (err, order)=>{
+            // console.log(err);
+            if (err) {
+                console.error("Razorpay Error: ", err); 
+                return res.status(500).json({ error: "Razorpay order creation failed", details: JSON.stringify(err) });
             }
-            req.user.createOrder({ orderid: order_id, status: "PENDING"}).then(()=>{
-                req.status(201).json({order, key_id: rzp.key_id});
+            req.user.createOrder({ orderid: order.id, status: 'PENDING'}).then(()=>{
+                res.status(201).json({order, key_id: rzp.key_id});
             })
             .catch((err=>{
-                throw new Error(err);
+                res.status(401).json({Error: err.message});
             }));
         })
     }
@@ -25,24 +27,21 @@ exports.purchasePremium=async(req,res)=>{
     }
 }
 
-exports.updateStatus=(req,res)=>{
+exports.updateStatus=async (req,res)=>{
     try{
         const {payment_id, order_id} =req.body;
-        Order.findOne({where :{orderid: order_id}}).then((order=>{
-            order.update({paymentid: payment_id, status: "SUCCESS"}).then(()=>{
-                req.user.update({ispremiumuser: true}).then(()=>{
-                    res.status(200).json({message: 'Transaction successfull'});
-                }).catch((err)=>{
-                    throw new Error(err);
-                });
-            }).catch((err)=>{
-                throw new Error(err);
-            });
-        })).catch((err)=>{
-            throw new Error(err);
+        const order=await Order.findOne({where :{orderid: order_id}})
+        const p1= order.update({paymentid: payment_id, status: "SUCCESS"});
+        const p2= req.user.update({ispremiumuser: true});
+
+        Promise.all([p1,p2]).then(()=>{
+            res.status(200).json({message: 'Transaction successfull', premium: req.user.ispremiumuser});
+        })
+        .catch((err)=>{
+            console.log(err.message);
         });
     }
     catch(err){
-        res.status(401).json({Error: err})
+        res.status(401).json({Error: err.message});
     }
 }

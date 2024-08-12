@@ -20,4 +20,5 @@ router.delete('/delete/:id', userauth.authenticate,expenseController.deleteExpen
 router.get('/PremiumMemberShip', userauth.authenticate,purchaseController.purchasePremium);
 router.post('/UpdatePremiumMemberShip', userauth.authenticate,purchaseController.updateStatus);
 
+router.get('/leaderboard', expenseController.getleaderboard);
 module.exports=router;

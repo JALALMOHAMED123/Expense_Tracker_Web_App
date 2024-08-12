@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Expense</title>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script src="https://checkout.razorpay.com/v1/checkout.js" defer></script>
     <script src="/js/Expense.js" defer></script>
 </head>
 <body>
@@ -24,8 +24,12 @@
         <br>
         <button type="submit">Add Expense</button>
     </form>
-    <button id="premium">Buy Premium</button>
+    <div id="premium"></div>
+    <div id="leaderboard"></div>
+    
     
     <ul id="list"></ul>
+
+    <ul id="AllExpenseslist"></ul>
 </body>
 </html>

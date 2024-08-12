@@ -21,9 +21,7 @@ const User=sequelize.define('User', {
         type: Datatype.STRING,
         allowNull: false
     },
-    ispremiumuser: {
-        type: Datatype.BOOLEAN
-    }
+    ispremiumuser: Datatype.BOOLEAN
 })
 
 module.exports=User;

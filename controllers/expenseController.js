@@ -57,7 +57,7 @@ exports.postLogin=async(req,res)=>{
         else{ res.status(404).json({error: "User not found"}); }
     }
     catch(err){
-        res.status(404).json({error: err});
+        res.status(404).json({error: err.message});
     }
 }
   
@@ -67,9 +67,9 @@ exports.getExpense=(req, res)=>{
 
 exports.fetchExpense=async(req, res)=>{
     try {
-        console.log(req.user.id);
+        // console.log(req.user.id);
         const expenses = await Expense.findAll( { where: {userId: req.user.id}} );
-        res.json(expenses); 
+        res.json({expenses, premium:req.user.ispremiumuser}); 
     } catch (error) {
         res.status(500).json({ error: 'Failed to fetch expenses' });
     }
@@ -93,4 +93,15 @@ exports.deleteExpense=(req,res)=>{
         return res.status(200).json({ message: "Expense destroyed"})
     })
     .catch(err=>res.status(500).json({error: err}));
+}
+
+exports.getleaderboard=async (req,res)=>{
+    try{
+        const AllExpenses= await Expense.findAll();
+        const AllUsers= await User.findAll();
+        return res.status(200).json({AllExpenses, AllUsers});
+    }
+    catch(err){
+        res.status(200).json({Error: err.message});
+    }
 }

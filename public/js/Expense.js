@@ -27,14 +27,24 @@ window.addEventListener("DOMContentLoaded", async ()=>
 {
     try{
         const res=await axios.get('/api/expenses', { headers: { "Authorization" :token }});
-        const expenses= res.data;
+        console.log(res.data.premium);
+        localStorage.setItem("premium", res.data.premium);
+        const premium = localStorage.getItem('premium'); 
+        if(premium!='null'){
+            const lb = document.getElementById('leaderboard');
+            lb.innerHTML = '<button id="leaderboard">Show leaderboard</button>';
+        } else{
+            const PR = document.getElementById('premium');
+            PR.innerHTML = '<button id="premium">Buy Premium</button>';
+        }
+        const expenses= res.data.expenses;
         const ul = document.getElementById('list');
         ul.innerHTML = ''; 
         expenses.forEach(expense => {
             showDetails(expense.id, expense.amount, expense.category, expense.description );
         });
     } catch (error) {
-        console.error('Error:', error);
+        console.log('Error:', error.message);
     }
 });
 
@@ -71,7 +81,13 @@ document.getElementById('premium').onclick=async function(event){
                 order_id: options.order_id,
                 payment_id: response.razorpay_payment_id,
             }, {  headers: { "Authorization": token } })
-            alert("You are a Premium Member Now");
+            .then((res)=>{
+                console.log(res.data.premium);
+                if(res.data.premium){
+                    document.getElementById('premium').remove();
+                }
+            })
+            alert('You are a Premium Member Now')
         }
     }
     const rzp1=new Razorpay(options);
@@ -81,4 +97,33 @@ document.getElementById('premium').onclick=async function(event){
         console.log(response);
         alert("Payment failed")
     });
+}
+document.getElementById('leaderboard').onclick=async function(){
+    try{
+    const res=await axios.get('/leaderboard')
+    
+    let expenses= res.data.AllExpenses;
+    expenses.sort((a,b)=> b.amount-a.amount);
+    console.log("success",expenses);
+    let users=res.data.AllUsers;
+    console.log("success",users);
+    const ul = document.getElementById('AllExpenseslist');
+    ul.innerHTML = '<h3>LeaderBoard</h3>'; 
+    expenses.forEach(expense => {
+        let user = users.find(user => user.id === expense.UserId);
+        if (user) {
+            AllExpenseDetails(user.name, expense.amount, expense.description);
+        }
+    });
+    }
+    catch(err){
+        console.log("error:",err.message);
+    }
+}
+function AllExpenseDetails(name, amount, des){
+    const ul=document.getElementById('AllExpenseslist');
+    
+    const li=document.createElement('li');
+    li.innerHTML=`${name} - ${amount} - ${des}`
+    ul.appendChild(li);
 }

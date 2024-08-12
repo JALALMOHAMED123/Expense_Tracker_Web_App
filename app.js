@@ -7,6 +7,8 @@ const sequelize=require('./util/db');
 const User=require('./models/signup');
 const Expense=require('./models/expense');
 const Order = require('./models/orders');
+require('dotenv').config();
+
 const app=express();
 
 app.use(bodyparser.urlencoded({ extended: false}));
