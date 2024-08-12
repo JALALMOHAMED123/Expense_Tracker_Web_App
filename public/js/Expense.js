@@ -30,9 +30,9 @@ window.addEventListener("DOMContentLoaded", async ()=>
         console.log(res.data.premium);
         localStorage.setItem("premium", res.data.premium);
         const premium = localStorage.getItem('premium'); 
-        if(premium!='null'){
+        if(premium!=='null' && premium!=='false'){
             const lb = document.getElementById('leaderboard');
-            lb.innerHTML = '<button id="leaderboard">Show leaderboard</button>';
+            lb.innerHTML = 'You are a Premim user <button id="leaderboard">Show leaderboard</button>';
         } else{
             const PR = document.getElementById('premium');
             PR.innerHTML = '<button id="premium">Buy Premium</button>';
@@ -82,12 +82,13 @@ document.getElementById('premium').onclick=async function(event){
                 payment_id: response.razorpay_payment_id,
             }, {  headers: { "Authorization": token } })
             .then((res)=>{
+                alert('You are a Premium Member Now')
                 console.log(res.data.premium);
                 if(res.data.premium){
                     document.getElementById('premium').remove();
                 }
             })
-            alert('You are a Premium Member Now')
+            
         }
     }
     const rzp1=new Razorpay(options);
@@ -108,7 +109,7 @@ document.getElementById('leaderboard').onclick=async function(){
     const ul = document.getElementById('AllExpenseslist');
     ul.innerHTML = '<h3>LeaderBoard</h3>'; 
     leaderboardusers.forEach(expense => {
-        AllExpenseDetails(expense.name, expense.total_cost);
+        AllExpenseDetails(expense.name, expense.totalExpense);
     });
     }
     catch(err){

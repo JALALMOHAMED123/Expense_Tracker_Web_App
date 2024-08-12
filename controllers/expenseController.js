@@ -4,7 +4,6 @@ const Expense=require('../models/expense');
 const bcrypt=require('bcrypt');
 const jwt=require('jsonwebtoken');
 const sequelize = require('../util/db');
-const { group } = require('console');
 
 exports.getSignup=(req,res)=>{
     res.sendFile(path.resolve('views/signup.html'));
@@ -81,35 +80,46 @@ exports.postExpense=async (req, res)=>{
         const {amount, description, category}=req.body;
         // const expense= await Expense.create({amount, description, category, UserId: req.user.id})
         const expense= await req.user.createExpense({amount, description, category});
+        
+        const user = await User.findByPk(expense.UserId);
+        
+        if (user) {
+            user.totalExpense=Number(user.totalExpense) + Number(amount);
+            await user.save();
+        }
+        console.log(user.totalExpense);
         res.status(201).json({message: "Expense created", expense});
     }
     catch(error){
-        res.status(404).json({error: "Expense not created"});
+        res.status(404).json({error: error.message});
     }
 }
 
-exports.deleteExpense=(req,res)=>{
+exports.deleteExpense=async(req,res)=>{
+    try{
     const id=req.params.id;
+    const expense = await Expense.findOne({ where: { id, UserId: req.user.id } });
+    const user = await User.findByPk(expense.UserId);
+        
+        if (user) {
+            user.totalExpense = Number(user.totalExpense) - Number(expense.amount);
+            await user.save();
+        }
+    console.log(user.totalExpense);
     Expense.destroy({where: {id, UserId: req.user.id}})
     .then(()=> {
         return res.status(200).json({ message: "Expense destroyed"})
     })
     .catch(err=>res.status(500).json({error: err}));
 }
+catch(err){
+    res.status(500).json({ error: err.message });
+}
+}
 
 exports.getleaderboard=async (req,res)=>{
     try{
-        const leaderboardofusers=await User.findAll({
-            attributes: ['id', 'name', [sequelize.fn('sum', sequelize.col('expenses.amount')), 'total_cost']],
-            include:[
-                {
-                    model: Expense,
-                    attributes: []
-                }
-            ],
-            group: ['user.id'],
-            order: [['total_cost', 'DESC']]
-        })
+        const leaderboardofusers=await User.findAll()
 
         return res.status(200).json({leaderboardofusers});
     }
