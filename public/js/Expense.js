@@ -102,28 +102,23 @@ document.getElementById('leaderboard').onclick=async function(){
     try{
     const res=await axios.get('/leaderboard')
     
-    let expenses= res.data.AllExpenses;
-    expenses.sort((a,b)=> b.amount-a.amount);
-    console.log("success",expenses);
-    let users=res.data.AllUsers;
-    console.log("success",users);
+    let leaderboardusers= res.data.leaderboardofusers;
+    console.log("success",leaderboardusers);
+    
     const ul = document.getElementById('AllExpenseslist');
     ul.innerHTML = '<h3>LeaderBoard</h3>'; 
-    expenses.forEach(expense => {
-        let user = users.find(user => user.id === expense.UserId);
-        if (user) {
-            AllExpenseDetails(user.name, expense.amount, expense.description);
-        }
+    leaderboardusers.forEach(expense => {
+        AllExpenseDetails(expense.name, expense.total_cost);
     });
     }
     catch(err){
         console.log("error:",err.message);
     }
 }
-function AllExpenseDetails(name, amount, des){
+function AllExpenseDetails(name, cost){
     const ul=document.getElementById('AllExpenseslist');
     
     const li=document.createElement('li');
-    li.innerHTML=`${name} - ${amount} - ${des}`
+    li.innerHTML=`Name - ${name} | Total Expense - ${cost}`
     ul.appendChild(li);
 }

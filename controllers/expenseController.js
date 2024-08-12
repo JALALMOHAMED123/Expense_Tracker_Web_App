@@ -3,6 +3,8 @@ const User=require('../models/signup');
 const Expense=require('../models/expense');
 const bcrypt=require('bcrypt');
 const jwt=require('jsonwebtoken');
+const sequelize = require('../util/db');
+const { group } = require('console');
 
 exports.getSignup=(req,res)=>{
     res.sendFile(path.resolve('views/signup.html'));
@@ -97,9 +99,19 @@ exports.deleteExpense=(req,res)=>{
 
 exports.getleaderboard=async (req,res)=>{
     try{
-        const AllExpenses= await Expense.findAll();
-        const AllUsers= await User.findAll();
-        return res.status(200).json({AllExpenses, AllUsers});
+        const leaderboardofusers=await User.findAll({
+            attributes: ['id', 'name', [sequelize.fn('sum', sequelize.col('expenses.amount')), 'total_cost']],
+            include:[
+                {
+                    model: Expense,
+                    attributes: []
+                }
+            ],
+            group: ['user.id'],
+            order: [['total_cost', 'DESC']]
+        })
+
+        return res.status(200).json({leaderboardofusers});
     }
     catch(err){
         res.status(200).json({Error: err.message});
