@@ -136,3 +136,7 @@ exports.getleaderboard=async (req,res)=>{
         res.status(200).json({Error: err.message});
     }
 }
+
+exports.forgetpassword=(req,res)=>{
+    return res.json({user_id: req.user.id});
+}

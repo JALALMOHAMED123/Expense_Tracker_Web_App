@@ -21,4 +21,6 @@ router.get('/PremiumMemberShip', userauth.authenticate,purchaseController.purcha
 router.post('/UpdatePremiumMemberShip', userauth.authenticate,purchaseController.updateStatus);
 
 router.get('/leaderboard', expenseController.getleaderboard);
+
+router.get('/password/forgotpassword', expenseController.forgetpassword);
 module.exports=router;
