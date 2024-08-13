@@ -4,6 +4,7 @@ const Expense=require('../models/expense');
 const bcrypt=require('bcrypt');
 const jwt=require('jsonwebtoken');
 const sequelize = require('../util/db');
+const { Transaction } = require('sequelize');
 
 exports.getSignup=(req,res)=>{
     res.sendFile(path.resolve('views/signup.html'));
@@ -79,16 +80,24 @@ exports.postExpense=async (req, res)=>{
     try{
         const {amount, description, category}=req.body;
         // const expense= await Expense.create({amount, description, category, UserId: req.user.id})
-        const expense= await req.user.createExpense({amount, description, category});
+        req.user.createExpense({amount, description, category}, {transaction: t})
+        .then(expense=>{
+            totalExpense=Number(user.totalExpense) + Number(amount);
+            User.update({totalExpense},{where: { id:req.user.id},transaction: t})
+            .then(async()=>{
+                t.commit();
+                res.status(200).json(expense);
+            })
+            .catch(async()=>{
+                await t.rollback();
+                return res.status(500).json({error: err.message});
+            })
+        })
+        .catch(async()=>{
+            await t.rollback();
+            return res.status(500).json({error: err.message});
+        })
         
-        const user = await User.findByPk(expense.UserId);
-        
-        if (user) {
-            user.totalExpense=Number(user.totalExpense) + Number(amount);
-            await user.save();
-        }
-        console.log(user.totalExpense);
-        res.status(201).json({message: "Expense created", expense});
     }
     catch(error){
         res.status(404).json({error: error.message});
