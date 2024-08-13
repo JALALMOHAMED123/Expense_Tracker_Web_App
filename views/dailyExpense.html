@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Day to Day Expenses</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Day to Day Expenses</h1>
+        <h2>2021</h2>
+        
+        <div class="report">
+            <h3>March 2021</h3>
+            <table class="expense-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Description</th>
+                        <th>Category</th>
+                        <th>Income</th>
+                        <th>Expense</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Add rows here dynamically -->
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="3"></td>
+                        <td>60,000.00</td>
+                        <td>5,670.00</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+
+        <div class="yearly-report">
+            <h3>Yearly Report</h3>
+            <table class="yearly-table">
+                <thead>
+                    <tr>
+                        <th>Month</th>
+                        <th>Income</th>
+                        <th>Expense</th>
+                        <th>Savings</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>March</td>
+                        <td>60,000.00</td>
+                        <td>5,670.00</td>
+                        <td>54,330.00</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="notes-report">
+            <h3>Notes Report 2021</h3>
+            <table class="notes-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Notes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    
+                </tbody>
+            </table>
+        </div>
+
+        <button id="downloadBtn" class="download-btn" disabled>Download</button>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
