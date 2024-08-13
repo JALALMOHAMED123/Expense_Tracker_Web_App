@@ -140,3 +140,24 @@ exports.getleaderboard=async (req,res)=>{
 exports.forgetpassword=(req,res)=>{
     return res.json({user_id: req.user.id});
 }
+
+exports.downloadexpense=async (req, res) => {
+    try {
+        const userId = req.user.id; 
+        const expenses = await Expense.findAll({
+            where: { userId }
+        });
+
+        const fields = ['date', 'description', 'category', 'income', 'expense'];
+        const opts = { fields };
+        const csv = parse(expenses, opts);
+
+        res.header('Content-Type', 'text/csv');
+        res.attachment('expenses.csv');
+        res.status(200).send(csv);
+
+    } catch (error) {
+        console.error('Error generating CSV:', error);
+        res.status(500).json({ error: 'Server error. Please try again later.' });
+    }
+};
