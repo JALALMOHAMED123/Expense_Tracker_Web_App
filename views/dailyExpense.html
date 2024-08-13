@@ -22,10 +22,24 @@
             margin: 0 5px;
             cursor: pointer;
         }
+        .rows-per-page {
+            margin-top: 10px;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
     <h1>Expense Report</h1>
+    <div class="rows-per-page">
+        <label for="rows-select">Rows per page:</label>
+        <select id="rows-select">
+            <option value="5">5</option>
+            <option value="10">10</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+        </select>
+    </div>
     <table>
         <thead>
             <tr>
@@ -46,6 +60,6 @@
         <button id="next-btn">Next</button>
     </div>
 
-    <script src="pagination.js"></script>
+    <script src="dynamic-pagination.js"></script>
 </body>
 </html>

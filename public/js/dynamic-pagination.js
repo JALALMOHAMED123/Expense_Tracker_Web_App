@@ -1,15 +1,13 @@
 document.addEventListener('DOMContentLoaded', () => {
     let currentPage = 1;
-    const itemsPerPage = 10;
-    let totalPages = 1;
-    const expenses = []; // This will be filled with data from the backend
+    let itemsPerPage = parseInt(localStorage.getItem('itemsPerPage')) || 10;
+    const expenses = []; 
 
-    // Mock data fetch function (replace this with an actual API call)
+    
     function fetchExpenses() {
         return [
             { date: '2024-01-01', description: 'Milk', category: 'Grocery', amount: 50 },
             { date: '2024-01-02', description: 'Electricity Bill', category: 'Utility', amount: 150 },
-            // Add more mock expenses here...
         ];
     }
 
@@ -32,17 +30,15 @@ document.addEventListener('DOMContentLoaded', () => {
             tableBody.appendChild(row);
         });
 
-        // Update pagination info
+        const totalPages = Math.ceil(expenses.length / itemsPerPage);
         document.getElementById('page-info').innerText = `Page ${currentPage} of ${totalPages}`;
 
-        // Enable/Disable buttons
         document.getElementById('prev-btn').disabled = currentPage === 1;
         document.getElementById('next-btn').disabled = currentPage === totalPages;
     }
 
     function initPagination() {
-        expenses.push(...fetchExpenses()); // Fetch expenses (replace with actual data)
-        totalPages = Math.ceil(expenses.length / itemsPerPage);
+        expenses.push(...fetchExpenses()); 
         renderExpenses();
 
         document.getElementById('prev-btn').addEventListener('click', () => {
@@ -58,6 +54,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 renderExpenses();
             }
         });
+
+        document.getElementById('rows-select').addEventListener('change', function() {
+            itemsPerPage = parseInt(this.value);
+            localStorage.setItem('itemsPerPage', itemsPerPage);
+            currentPage = 1; 
+            renderExpenses();
+        });
+
+        document.getElementById('rows-select').value = itemsPerPage;
     }
 
     initPagination();
