@@ -1,11 +1,11 @@
-const User=require('../models/signup');
+const User=require('../models/user');
 const jwt=require('jsonwebtoken');
 
 exports.authenticate=(req, res, next)=>{
     try{
         const token=req.header('Authorization');
         console.log(token);
-        const user=jwt.verify(token, '374bfu2yryr8234rt02bfe032r230');
+        const user=jwt.verify(token, process.env.TOKEN_SECRET);
         console.log("userId >>> ",user.userId);
         User.findByPk(user.userId)
         .then(user=>{
@@ -16,6 +16,6 @@ exports.authenticate=(req, res, next)=>{
     } 
     catch(err){
         console.log(err);
-        res.status(401).json({error: "something went wrong in authentication"});
+        res.status(401).json({error: err.message});
     }
 }
