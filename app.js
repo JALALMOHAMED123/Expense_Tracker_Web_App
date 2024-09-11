@@ -25,7 +25,7 @@ dotenv.config();
 app.use(cors());
 // app.use((err, req, res, next) => {
 //     logger.error(err.message, { stack: err.stack });
-//     res.status(500).send('Something went wrong!');
+//     res.status(500).send('Something went wrong in git!');
 //   });
   
 app.use(bodyparser.urlencoded({ extended: false}));
