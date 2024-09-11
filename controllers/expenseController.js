@@ -1,103 +1,101 @@
 const path=require('path');
-const User=require('../models/signup');
+const User=require('../models/user');
 const Expense=require('../models/expense');
-const bcrypt=require('bcrypt');
-const jwt=require('jsonwebtoken');
+
 const sequelize = require('../util/db');
-const { Transaction } = require('sequelize');
-
-exports.getSignup=(req,res)=>{
-    res.sendFile(path.resolve('views/signup.html'));
-}
-
-exports.postSignup=async(req,res)=>{
-    try{
-    const {name, email, password, ispremiumuser}=req.body;
-    console.log(name);
-    //check the user exist or not
-    const userexist=await User.findOne({ where: {email} });
-    if(userexist){
-        return res.status(400).json({error: "Email already exists"});
-    }  
-    else{
-        const saltrounds=10;
-        bcrypt.hash(password, saltrounds, async(err, hash)=>{
-            console.log(err);
-            await User.create({name, email, password: hash, ispremiumuser});
-            res.status(201).json({ message: "User created successfully" });
-        }) 
-    }
-    } catch(err){  
-            res.status(500).json({error: "user not created"});
-        }
-}
-
-exports.getLogin=(req,res)=>{
-    res.sendFile(path.join(__dirname,'../views/login.html'));
-}
-
-function webtoken(id){
-    return jwt.sign({ userId: id}, '374bfu2yryr8234rt02bfe032r230');
-}
-exports.postLogin=async(req,res)=>{
-    try{
-        const {email, password}=req.body;
-        const user=await User.findAll({ where: {email}});
-        if(user){
-            bcrypt.compare(password, user[0].password, (err,result)=>{
-                if(err){
-                    throw new Error("something went wrong");
-                }
-                if(result==true) {
-                    return res.json({ redirect: '/Expense', token: webtoken(user[0].id)});
-                }
-                else{
-                    res.status(401).json({error: "User not authorized"});
-                }
-            });
-        }
-        else{ res.status(404).json({error: "User not found"}); }
-    }
-    catch(err){
-        res.status(404).json({error: err.message});
-    }
-}
-  
-exports.getExpense=(req, res)=>{
-    res.sendFile(path.resolve('views/Expense.html'));
-}
+const S3services=require('../services/S3services');
+const History=require('../models/filedownload');
 
 exports.fetchExpense=async(req, res)=>{
     try {
-        // console.log(req.user.id);
         const expenses = await Expense.findAll( { where: {userId: req.user.id}} );
         res.json({expenses, premium:req.user.ispremiumuser}); 
     } catch (error) {
-        res.status(500).json({ error: 'Failed to fetch expenses' });
+        res.status(500).json({ error: error.message });
+    }
+}
+const ITEM_PER_PAGE = 2;
+
+exports.getpagination = async(req, res) => {
+    const page = +req.query.page || 1;
+    const pageSize = +req.query.pagesize || ITEM_PER_PAGE;
+    let totalItems;
+
+    await Expense.count({ where: { userId: req.user.id } })
+        .then(count => {
+            totalItems = count;
+            return Expense.findAll({
+                where: { userId: req.user.id },
+                offset: (page - 1) * pageSize,
+                limit: pageSize
+            });
+        })
+        .then(expenses => {
+            res.json({
+                expenses: expenses,
+                currentPage: page,
+                hasNextPage: pageSize  * page < totalItems,
+                nextPage: page + 1,
+                hasPreviousPage: page > 1,
+                previousPage: page - 1,
+                lastPage: Math.ceil(totalItems / pageSize ),
+                premium:req.user.ispremiumuser
+            });
+        })
+        .catch(err => {
+            console.log(err.message);
+        });
+}
+
+exports.download = async (req, res) => {
+    try {
+        const expenses=await Expense.findAll();
+        const stringifiedExpenses=JSON.stringify(expenses);
+        const userId=req.user.id;
+
+        const filename=`Expense${userId}/${new Date()}.txt`;
+        const fileurl=await S3services.uploadToS3(stringifiedExpenses, filename);
+        console.log(fileurl);
+        await History.create({path: fileurl, UserId: req.user.id});
+        res.status(200).json({fileurl});
+
+    } catch (err) {
+        res.status(500).json({ error: err.message});
+    }
+};
+
+exports.historydownload=async(req, res)=>{
+    try{
+        const history=await History.findAll({where: {userId: req.user.id}});
+        res.status(200).json({history});
+    }
+    catch(err){
+        res.status(401).json({ err:err.message});
     }
 }
 exports.postExpense=async (req, res)=>{
     try{
+        
         const {amount, description, category}=req.body;
+        const t=await sequelize.transaction();
         // const expense= await Expense.create({amount, description, category, UserId: req.user.id})
         req.user.createExpense({amount, description, category}, {transaction: t})
         .then(expense=>{
-            totalExpense=Number(user.totalExpense) + Number(amount);
+            totalExpense=Number(req.user.totalExpense) + Number(amount);
             User.update({totalExpense},{where: { id:req.user.id},transaction: t})
             .then(async()=>{
-                t.commit();
-                res.status(200).json(expense);
+                await t.commit();
+                res.status(200).json({expense, message: "Expense created"});
             })
-            .catch(async()=>{
+            .catch(async(err)=>{
                 await t.rollback();
                 return res.status(500).json({error: err.message});
             })
         })
-        .catch(async()=>{
+        .catch(async(err)=>{
             await t.rollback();
-            return res.status(500).json({error: err.message});
+            return res.status(500).json({reason: "create Expense", error: err.message});
         })
-        
     }
     catch(error){
         res.status(404).json({error: error.message});
@@ -107,57 +105,43 @@ exports.postExpense=async (req, res)=>{
 exports.deleteExpense=async(req,res)=>{
     try{
     const id=req.params.id;
-    const expense = await Expense.findOne({ where: { id, UserId: req.user.id } });
-    const user = await User.findByPk(expense.UserId);
-        
-        if (user) {
-            user.totalExpense = Number(user.totalExpense) - Number(expense.amount);
-            await user.save();
-        }
+    const t=await sequelize.transaction();
+    const expense= await Expense.findOne({ where: { id, UserId: req.user.id }, transaction: t});
+    if (!expense) {
+        await t.rollback();
+        return res.status(404).json({ error: "Expense not found" });
+    }
+    
+    const user=await User.findByPk(expense.UserId, { transaction: t});
     console.log(user.totalExpense);
-    Expense.destroy({where: {id, UserId: req.user.id}})
-    .then(()=> {
-        return res.status(200).json({ message: "Expense destroyed"})
-    })
-    .catch(err=>res.status(500).json({error: err}));
+    if (!user) {
+        await t.rollback();
+        return res.status(404).json({ error: "User not found" });
+    }
+    totalExpense = Number(user.totalExpense) - Number(expense.amount);
+    
+    await User.update({totalExpense},{where: { id:req.user.id},transaction: t});
+
+    await Expense.destroy({where: {id, UserId: req.user.id}, transaction: t});
+
+    await t.commit();
+    return res.status(200).json({ message: "Expense destroyed"});
 }
-catch(err){
-    res.status(500).json({ error: err.message });
-}
+    catch(err){
+        await t.rollback();
+        res.status(500).json({ error: err.message });
+    }
 }
 
 exports.getleaderboard=async (req,res)=>{
     try{
-        const leaderboardofusers=await User.findAll()
+        const leaderboardofusers=await User.findAll({
+            order: [['totalExpense', 'DESC']]
+        })
 
         return res.status(200).json({leaderboardofusers});
     }
     catch(err){
-        res.status(200).json({Error: err.message});
+        res.status(401).json({Error: err.message});
     }
 }
-
-exports.forgetpassword=(req,res)=>{
-    return res.json({user_id: req.user.id});
-}
-
-exports.downloadexpense=async (req, res) => {
-    try {
-        const userId = req.user.id; 
-        const expenses = await Expense.findAll({
-            where: { userId }
-        });
-
-        const fields = ['date', 'description', 'category', 'income', 'expense'];
-        const opts = { fields };
-        const csv = parse(expenses, opts);
-
-        res.header('Content-Type', 'text/csv');
-        res.attachment('expenses.csv');
-        res.status(200).send(csv);
-
-    } catch (error) {
-        console.error('Error generating CSV:', error);
-        res.status(500).json({ error: 'Server error. Please try again later.' });
-    }
-};

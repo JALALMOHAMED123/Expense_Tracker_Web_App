@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expense</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://checkout.razorpay.com/v1/checkout.js" defer></script>
+    <script src="../js/Expense.js" defer></script>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <a class="navbar-brand">Expense Tracker</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <div class="d-flex align-items-center" id="dailyExpense"></div>
+                </li>
+                <li class="nav-item">
+                    <div id="leaderboard"></div>
+                </li>
+                <li class="nav-item">
+                    <div id="downloadExpense"></div>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" style="cursor:pointer;" onclick='logout()'>Log out</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <form id="createExpense" class="mb-4">
+            <h2>Add New Expense</h2>
+            <div class="form-group">
+                <label for="expense">Amount:</label>
+                <input type="number" id="expense" name="amount" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="desc">Description:</label>
+                <textarea id="desc" name="description" class="form-control" required></textarea>
+            </div>
+            <div class="form-group">
+                <label for="category">Choose Category:</label>
+                <select name="category" id="category" class="form-select" required>
+                    <option value="fuel">Petrol</option>
+                    <option value="movie">Movie</option>
+                    <option value="food">Food</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Add Expense</button>
+        </form>
+
+        <div id="premium" class="mb-4"></div>
+        <ul id="AllExpenseslist" class="list-group mb-4"></ul>
+
+        <ul id="list" class="list-group mb-4"></ul>
+
+        <div id="rows_pagination" class="mb-4"></div>
+
+        <ul id="pagination" class="pagination"></ul>
+
+        <ul id="fileHistorylist" class="list-group mb-4"></ul>
+
+        
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.min.js"></script>
+</body>
+</html>
