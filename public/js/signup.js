@@ -14,6 +14,7 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(function(response) {
                 alert(response.data.message);
                 document.getElementById('createuser').reset();
+                window.location.href="/login.html";
             })
             .catch(function(error) {
                 if (error.response && error.response.data.error) {

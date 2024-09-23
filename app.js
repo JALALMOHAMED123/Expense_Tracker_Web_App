@@ -52,10 +52,11 @@ app.use(
   })
 );
 
-
-  
-// app.use(helmet());
 app.use(compression());
+
+app.get('/',(req,res)=>{
+  res.redirect('/login.html');
+});
 
 app.use(UsereRoutes);
 app.use(ExpenseRoutes);
@@ -89,5 +90,5 @@ sequelize
         app.listen(process.env.PORT);
     })
     .catch(err => {
-        console.log(err);
+        console.log(err.message);
     });
