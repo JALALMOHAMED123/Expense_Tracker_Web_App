@@ -36,7 +36,7 @@ const forgotpassword = async (req, res) => {
                     to: receivers,
                     subject: 'Reset password',
                     textContent: `Reset Password Link:`,
-                    htmlContent: `<a href="http://localhost:3000/password/resetpassword/${id}">Reset password</a>`,
+                    htmlContent: `<a href="http://44.222.29.219:3000/password/resetpassword/${id}">Reset password</a>`,
                 })
                 .then((response) => {
                     return res.status(200).json({ message: 'Reset password link sent to your mail Id' });
@@ -65,7 +65,7 @@ const resetpassword = (req, res) => {
                                             e.preventDefault();
                                         }
                                     </script>
-                                    <form action="http://localhost:3000/password/updatepassword/${id}" method="get">
+                                    <form action="http://44.222.29.219:3000/password/updatepassword/${id}" method="get">
                                         <label for="newpassword">Enter New password</label>
                                         <input name="newpassword" type="password" required></input>
                                         <button>reset password</button>
