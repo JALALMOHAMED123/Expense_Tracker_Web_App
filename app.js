@@ -23,10 +23,6 @@ const app=express();
 dotenv.config();
 
 app.use(cors());
-// app.use((err, req, res, next) => {
-//     logger.error(err.message, { stack: err.stack });
-//     res.status(500).send('Something went wrong!');
-//   });
   
 app.use(bodyparser.urlencoded({ extended: false}));
 
