@@ -1,0 +1,82 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f7f7f7;
+    margin: 0;
+    padding: 0;
+    padding-top: 56px; /* Adjust for the navbar height */
+}
+
+.container {
+    max-width: 400px; /* Set a specific max width */
+    margin: 20px auto; /* Center the container */
+    padding: 20px;
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Add box shadow */
+}
+
+h1, h2, h3 {
+    text-align: center;
+    color: #4a90e2;
+}
+
+.form-control, .form-select {
+    margin-bottom: 15px;
+}
+
+.btn {
+    margin-top: 10px;
+}
+
+.list-group-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.navbar {
+    margin-bottom: 20px;
+}
+
+.card {
+    margin: 25px auto;
+    border: 1px solid #ddd; /* Add a subtle border */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Ensure box shadow is applied */
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+table, th, td {
+    border: 1px solid #ddd;
+}
+
+th, td {
+    padding: 10px;
+    text-align: left;
+}
+
+th {
+    background-color: #4a90e2;
+    color: #fff;
+}
+
+tfoot {
+    font-weight: bold;
+    background-color: #f0f0f0;
+}
+
+h3 {
+    margin-top: 20px;
+    font-weight: bold;
+}
+
+button {
+    margin: 5px;
+}
+
+.pagination {
+    justify-content: center;
+}
